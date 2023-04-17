@@ -6,17 +6,25 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
-;; ensure all selected pacakages are downloaded
-(unless package-archive-contents
-  (package-refresh-contents))
-(package-install-selected-packages)
-(require 'ido)
-(require 'git-gutter)
-(require 'multiple-cursors)
+;; Haven't really tested this, but in theory I can bootstrap config on a new
+;; server this way. The other way to do this is with package-install-selected-packages,
+;; but the requisite variable isn't bound until the end of init, so it needs to be
+;; manually set before use.
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
 
+;; use-package should always install a package if it's not already installed
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+
+;; add and configure packages
+(use-package expand-region)
+(use-package ido)
+(use-package git-gutter)
+(use-package multiple-cursors)
+(use-package material-theme)
 (use-package lsp-mode
   :commands lsp)
-
 (use-package vue-mode
   :mode "\\.vue\\'"
   :config
@@ -27,9 +35,9 @@
 ;; minor modes and setting tweaks
 ;; ===========================================================================
 (global-linum-mode 1)
+(add-to-list 'exec-path "/usr/local/bin/")
 (add-to-list 'exec-path "~/.cargo/bin")
 (add-to-list 'exec-path "~/go/bin")
-(add-to-list 'exec-path "/opt/homebrew/bin/")
 (tool-bar-mode 0)
 (if (boundp 'scroll-bar-mode)
     (scroll-bar-mode 0))
@@ -43,7 +51,8 @@
 (setq-default indent-tabs-mode 0)
 (setq-default tab-width 4)
 (ido-mode)
-(require 'org-tempo)
+;; don't even remember what this is
+;(use-package org-tempo)
 (setq-default kill-whole-line 1)
 (xterm-mouse-mode)
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
@@ -57,7 +66,7 @@
     (progn
       (xterm-mouse-mode)
       ;(xclip-mode)
-      (add-to-list 'exec-path "/usr/local/bin/")
+	  (add-to-list 'exec-path "/opt/homebrew/bin/")
       (defun up-slightly () (interactive) (scroll-up 2))
       (defun down-slightly () (interactive) (scroll-down 2))
       (global-set-key [mouse-4] 'down-slightly)
@@ -67,8 +76,6 @@
 (setq gc-cons-threshold 100000000)
 ;; LSP reads very large objects
 (setq read-process-output-max (* 1024 1024))
-
-(add-to-list 'exec-path "/usr/local/bin/")
 
 ;; ===========================================================================
 ;; cosmetics
@@ -110,7 +117,7 @@ Version 2017-11-01"
 
 
 (defun rlp-ibuffer-hook ()
-  "Hook to make a single click open a buffer in ibuffer"
+  "Hook to make a single click open a buffer when in ibuffer"
   (define-key ibuffer-name-map [mouse-1] 'ibuffer-visit-buffer)
   (define-key ibuffer-mode-map [mouse-1] 'ibuffer-visit-buffer))
   
@@ -139,7 +146,8 @@ Version 2017-11-01"
 	  (split-window-below)
 	(delete-window win)))))
 
-(setq org-roam-directory (file-truename "~/Dropbox/Documents/notes"))
+;; not actually using org-roam
+;; (setq org-roam-directory (file-truename "~/Dropbox/Documents/notes"))
 ;; (org-roam-db-autosync-mode)
 
 ;; ===========================================================================
@@ -193,15 +201,12 @@ Version 2017-11-01"
 (global-set-key (kbd "s-v") 'yank)
 (global-set-key (kbd "s-n") 'make-frame-command)
 (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
-
-;; custom
 (global-set-key (kbd "C-j") 'xah-select-line)
 (global-set-key (kbd "s-l") 'xah-select-line)
 
 ;; mode keybindings
 
 ;; git-gutter
-(require 'git-gutter)
 (global-git-gutter-mode +1)
 (global-set-key (kbd "C-; g p") 'git-gutter:previous-hunk)
 (global-set-key (kbd "C-; g n") 'git-gutter:next-hunk)
@@ -211,7 +216,7 @@ Version 2017-11-01"
 (global-set-key (kbd "s-d") 'mc/mark-next-like-this-word)
 (global-set-key (kbd "s-j") 'mc/mark-next-like-this) ;; what's this?
 
-(require 'expand-region)
+;; expand-rgion
 (global-set-key (kbd "s-e") 'er/expand-region)
 
 ;; projectile
@@ -231,7 +236,7 @@ Version 2017-11-01"
              (define-key erc-mode-map (kbd "s-<return>") 'erc-send-current-line)))
 
 
-;; mouse bindings
+;; mouse bindings - work in progress
 ;;(global-set-key [double-mouse-1] 'split-window-below)
 ;;(global-set-key [mouse-2] 'split-window-below) ; doesn't work on mac
 ;; (global-set-key [mouse-3] 'rlp-clickity-click)
@@ -254,7 +259,7 @@ Version 2017-11-01"
    '(ccls lsp-actionscript lsp-ada lsp-angular lsp-ansible lsp-astro lsp-bash lsp-beancount lsp-clangd lsp-clojure lsp-cmake lsp-crystal lsp-csharp lsp-css lsp-d lsp-dart lsp-dhall lsp-docker lsp-dockerfile lsp-elm lsp-elixir lsp-emmet lsp-erlang lsp-eslint lsp-fortran lsp-fsharp lsp-gdscript lsp-go lsp-gleam lsp-graphql lsp-hack lsp-grammarly lsp-groovy lsp-haskell lsp-haxe lsp-idris lsp-java lsp-javascript lsp-json lsp-kotlin lsp-latex lsp-ltex lsp-lua lsp-markdown lsp-marksman lsp-mint lsp-nginx lsp-nim lsp-nix lsp-magik lsp-metals lsp-mssql lsp-ocaml lsp-openscad lsp-pascal lsp-perl lsp-perlnavigator lsp-pls lsp-php lsp-pwsh lsp-pyls lsp-pylsp lsp-pyright lsp-python-ms lsp-purescript lsp-r lsp-racket lsp-remark lsp-rf lsp-rust lsp-solargraph lsp-sorbet lsp-sourcekit lsp-sonarlint lsp-tailwindcss lsp-tex lsp-terraform lsp-toml lsp-ttcn3 lsp-typeprof lsp-v lsp-vala lsp-verilog lsp-volar lsp-vhdl lsp-vimscript lsp-xml lsp-yaml lsp-ruby-syntax-tree lsp-sqls lsp-svelte lsp-steep lsp-zig))
  '(lsp-disabled-clients '(vetur))
  '(package-selected-packages
-   '(flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
+   '(org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
  '(rustic-analyzer-command '("/home/rob/.cargo/bin/rust-analyzer"))
  '(typescript-auto-indent-flag nil)
  '(typescript-indent-level 2)
