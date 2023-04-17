@@ -1,6 +1,7 @@
 auto-save-list/
 backups/
 elpa/
+transient/
 projectile-bookmarks.eld
 ido.last
 .lsp-session-v1
