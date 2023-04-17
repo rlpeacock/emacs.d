@@ -6,6 +6,10 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
+;; ensure all selected pacakages are downloaded
+(unless package-archive-contents
+  (package-refresh-contents))
+(package-install-selected-packages)
 (require 'ido)
 (require 'git-gutter)
 (require 'multiple-cursors)
