@@ -1,0 +1,7 @@
+auto-save-list/
+backups/
+elpa/
+projectile-bookmarks.eld
+ido.last
+.lsp-session-v1
+*.elc
