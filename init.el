@@ -18,23 +18,55 @@
 (setq use-package-always-ensure t)
 
 ;; add and configure packages
+(use-package ag)
+(use-package company)
+(use-package company-go)
 (use-package expand-region)
-(use-package ido)
+(use-package flycheck)
+(use-package flycheck-golangci-lint)
+(use-package flycheck-projectile)
+(use-package flycheck-pycheckers)
+(use-package flycheck-rust)
+(use-package flymake)
+(use-package flymake-aspell)
+(use-package flymake-css)
+(use-package flymake-diagnostic-at-point)
+(use-package flymake-eslint)
+(use-package flymake-go)
+(use-package flymake-go-staticcheck)
 (use-package git-gutter)
-(use-package multiple-cursors)
-(use-package material-theme)
+(use-package git-gutter-fringe)
+(use-package go-dlv)
+(use-package go-fill-struct)
+(use-package go-mode)
+(use-package go-playground)
+(use-package go-projectile)
+(use-package go-rename)
+(use-package ido)
 (use-package lsp-mode
   :commands lsp)
+(use-package magit)
+(use-package material-theme)
+(use-package multiple-cursors)
+(use-package org-roam)
+;(use-package org-tempo)
+(use-package projectile)
+(use-package projectile-speedbar)
+(use-package rust-mode)
+(use-package rustic)
+(use-package typescript-mode)
+(use-package use-package)
+(use-package vue-html-mode)
 (use-package vue-mode
   :mode "\\.vue\\'"
   :config
   (add-hook 'vue-mode-hook #'lsp))
 
-
 ;; ===========================================================================
 ;; minor modes and setting tweaks
 ;; ===========================================================================
-(global-linum-mode 1)
+
+(global-linum-mode 0)
 (add-to-list 'exec-path "/usr/local/bin/")
 (add-to-list 'exec-path "~/.cargo/bin")
 (add-to-list 'exec-path "~/go/bin")
@@ -237,9 +269,9 @@ Version 2017-11-01"
 
 
 ;; mouse bindings - work in progress
-;;(global-set-key [double-mouse-1] 'split-window-below)
+(global-set-key [double-mouse-1] 'split-window-below)
 ;;(global-set-key [mouse-2] 'split-window-below) ; doesn't work on mac
-;; (global-set-key [mouse-3] 'rlp-clickity-click)
+(global-set-key [mouse-3] 'rlp-clickity-click)
 ;(global-set-key [mouse-3] 'mouse-delete-window)
 ;; clicking on filename in the modeline will bring up ibuffer
 (define-key mode-line-buffer-identification-keymap [mode-line mouse-1] 'ibuffer)
