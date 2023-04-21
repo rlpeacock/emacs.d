@@ -22,6 +22,8 @@
 (use-package company)
 (use-package company-go)
 (use-package expand-region)
+(use-package fish-mode)
+(use-package fish-completion)
 (use-package flycheck)
 (use-package flycheck-golangci-lint)
 (use-package flycheck-projectile)
@@ -92,6 +94,13 @@
 (global-git-gutter-mode +1)
 (projectile-mode +1)
 (setq ring-bell-function 'ignore)
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline "~/Documents/notes/tasks.org" "Tasks")
+         "* TODO %?\n  %i\n  %a")
+        ("j" "Journal" entry (file+datetree "~/Documents/notes/journal.org")
+         "* %?\nEntered on %U\n  %i\n  %a" :epmty-lines-before 1)
+		("s" "Snippet" entry (file "~/Documents/notes/snippets.org")
+		 "* %?\n#+BEGIN_SRC\n%c\n#+END_SRC"  :empty-lines-before 1)))
 ;; mac specific settings
 ;; todo: do I want mouse and clip on Linux?
 (if (string-equal system-type "darwin")
@@ -291,7 +300,7 @@ Version 2017-11-01"
    '(ccls lsp-actionscript lsp-ada lsp-angular lsp-ansible lsp-astro lsp-bash lsp-beancount lsp-clangd lsp-clojure lsp-cmake lsp-crystal lsp-csharp lsp-css lsp-d lsp-dart lsp-dhall lsp-docker lsp-dockerfile lsp-elm lsp-elixir lsp-emmet lsp-erlang lsp-eslint lsp-fortran lsp-fsharp lsp-gdscript lsp-go lsp-gleam lsp-graphql lsp-hack lsp-grammarly lsp-groovy lsp-haskell lsp-haxe lsp-idris lsp-java lsp-javascript lsp-json lsp-kotlin lsp-latex lsp-ltex lsp-lua lsp-markdown lsp-marksman lsp-mint lsp-nginx lsp-nim lsp-nix lsp-magik lsp-metals lsp-mssql lsp-ocaml lsp-openscad lsp-pascal lsp-perl lsp-perlnavigator lsp-pls lsp-php lsp-pwsh lsp-pyls lsp-pylsp lsp-pyright lsp-python-ms lsp-purescript lsp-r lsp-racket lsp-remark lsp-rf lsp-rust lsp-solargraph lsp-sorbet lsp-sourcekit lsp-sonarlint lsp-tailwindcss lsp-tex lsp-terraform lsp-toml lsp-ttcn3 lsp-typeprof lsp-v lsp-vala lsp-verilog lsp-volar lsp-vhdl lsp-vimscript lsp-xml lsp-yaml lsp-ruby-syntax-tree lsp-sqls lsp-svelte lsp-steep lsp-zig))
  '(lsp-disabled-clients '(vetur))
  '(package-selected-packages
-   '(org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
+   '(fish-completion fish-mode org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
  '(rustic-analyzer-command '("/home/rob/.cargo/bin/rust-analyzer"))
  '(typescript-auto-indent-flag nil)
  '(typescript-indent-level 2)
