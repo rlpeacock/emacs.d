@@ -40,7 +40,9 @@
 (use-package git-gutter-fringe)
 (use-package go-dlv)
 (use-package go-fill-struct)
-(use-package go-mode)
+(use-package go-mode
+  :config
+  (add-hook 'go-mode-hook #'lsp))
 (use-package go-playground)
 (use-package go-projectile)
 (use-package go-rename)
@@ -49,6 +51,7 @@
   :commands lsp)
 (use-package magit)
 (use-package material-theme)
+(use-package minions)
 (use-package multiple-cursors)
 (use-package org-roam)
 ;(use-package org-tempo)
@@ -85,6 +88,7 @@
 (setq-default indent-tabs-mode 0)
 (setq-default tab-width 4)
 (ido-mode)
+(minions-mode)
 ;; don't even remember what this is
 ;(use-package org-tempo)
 (setq-default kill-whole-line 1)
