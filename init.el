@@ -232,6 +232,8 @@ Version 2017-11-01"
 (define-key isearch-mode-map (kbd "s-f") 'isearch-repeat-forward)
 (global-set-key (kbd "s-<right>") 'windmove-right)
 (global-set-key (kbd "s-<left>") 'windmove-left)
+(global-set-key (kbd "s-<up>") 'windmove-up)
+(global-set-key (kbd "s-<down>") 'windmove-down)
 (global-set-key (kbd "s-s") 'save-buffer)
 (global-set-key (kbd "s-o") 'ido-find-file)
 (global-set-key (kbd "s-b") 'ibuffer)
