@@ -68,13 +68,12 @@
   :mode "\\.vue\\'"
   :config
   (add-hook 'vue-mode-hook #'lsp))
-(use-package ya-snippet)
+(use-package yasnippet)
 
 ;; ===========================================================================
 ;; minor modes and setting tweaks
 ;; ===========================================================================
 
-(global-linum-mode 0)
 (add-to-list 'exec-path "/usr/local/bin/")
 (add-to-list 'exec-path "~/.cargo/bin")
 (add-to-list 'exec-path "~/go/bin")
@@ -90,17 +89,14 @@
 (set-default-coding-systems 'utf-8)
 (setq-default indent-tabs-mode 0)
 (setq-default tab-width 4)
+(setq-default display-line-numbers t)
 (ido-mode)
 (minions-mode)
-;; don't even remember what this is
-;(use-package org-tempo)
-(setq-default kill-whole-line 1)
 (xterm-mouse-mode)
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 (setq ring-bell-function 'ignore)
 (global-git-gutter-mode +1)
 (projectile-mode +1)
-(setq ring-bell-function 'ignore)
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline "~/Documents/notes/tasks.org" "Tasks")
          "* TODO %?\n  %i\n  %a")
@@ -112,7 +108,6 @@
 ;; todo: do I want mouse and clip on Linux?
 (if (string-equal system-type "darwin")
     (progn
-      (xterm-mouse-mode)
       ;(xclip-mode)
 	  (add-to-list 'exec-path "/opt/homebrew/bin/")
       (defun up-slightly () (interactive) (scroll-up 2))
@@ -125,6 +120,17 @@
 ;; LSP reads very large objects
 (setq read-process-output-max (* 1024 1024))
 
+(add-hook 'before-save-hook 'gofmt-before-save)
+
+;; save modified buffers on focus out
+;; this seems to bypass before-save-hook so need to manually trigger go formatter
+(defun rlp-save-all ()
+  (interactive)
+  (when (eq major-mode 'go-mode)
+	(gofmt))
+  (message "saving everything!")
+  (save-some-buffers t))
+(add-hook 'focus-out-hook 'rlp-save-all)
 ;; ===========================================================================
 ;; cosmetics
 ;; ===========================================================================
@@ -309,7 +315,7 @@ Version 2017-11-01"
    '(ccls lsp-actionscript lsp-ada lsp-angular lsp-ansible lsp-astro lsp-bash lsp-beancount lsp-clangd lsp-clojure lsp-cmake lsp-crystal lsp-csharp lsp-css lsp-d lsp-dart lsp-dhall lsp-docker lsp-dockerfile lsp-elm lsp-elixir lsp-emmet lsp-erlang lsp-eslint lsp-fortran lsp-fsharp lsp-gdscript lsp-go lsp-gleam lsp-graphql lsp-hack lsp-grammarly lsp-groovy lsp-haskell lsp-haxe lsp-idris lsp-java lsp-javascript lsp-json lsp-kotlin lsp-latex lsp-ltex lsp-lua lsp-markdown lsp-marksman lsp-mint lsp-nginx lsp-nim lsp-nix lsp-magik lsp-metals lsp-mssql lsp-ocaml lsp-openscad lsp-pascal lsp-perl lsp-perlnavigator lsp-pls lsp-php lsp-pwsh lsp-pyls lsp-pylsp lsp-pyright lsp-python-ms lsp-purescript lsp-r lsp-racket lsp-remark lsp-rf lsp-rust lsp-solargraph lsp-sorbet lsp-sourcekit lsp-sonarlint lsp-tailwindcss lsp-tex lsp-terraform lsp-toml lsp-ttcn3 lsp-typeprof lsp-v lsp-vala lsp-verilog lsp-volar lsp-vhdl lsp-vimscript lsp-xml lsp-yaml lsp-ruby-syntax-tree lsp-sqls lsp-svelte lsp-steep lsp-zig))
  '(lsp-disabled-clients '(vetur))
  '(package-selected-packages
-   '(lua-mode go-snippets yasnippet org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
+   '(ya-snippet lua-mode go-snippets yasnippet org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
  '(rustic-analyzer-command '("/home/rob/.cargo/bin/rust-analyzer"))
  '(typescript-auto-indent-flag nil)
  '(typescript-indent-level 2)
