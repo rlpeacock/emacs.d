@@ -1,0 +1,6 @@
+# key: erp
+# name: error panic
+# --
+if $1 != nil {
+   panic(fmt.Sprintf("$2: %s", $1))
+}

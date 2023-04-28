@@ -68,7 +68,9 @@
   :mode "\\.vue\\'"
   :config
   (add-hook 'vue-mode-hook #'lsp))
-(use-package yasnippet)
+(use-package yasnippet
+  :config
+  (yas-global-mode 1))
 
 ;; ===========================================================================
 ;; minor modes and setting tweaks
