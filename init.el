@@ -6,10 +6,7 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
-;; Haven't really tested this, but in theory I can bootstrap config on a new
-;; server this way. The other way to do this is with package-install-selected-packages,
-;; but the requisite variable isn't bound until the end of init, so it needs to be
-;; manually set before use.
+(package-refresh-contents)
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
