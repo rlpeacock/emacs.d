@@ -56,6 +56,7 @@
 ;(use-package org-tempo)
 (use-package projectile)
 (use-package projectile-speedbar)
+(use-package request)
 (use-package rust-mode)
 (use-package rustic)
 (use-package typescript-mode)
@@ -199,6 +200,35 @@ Version 2017-11-01"
 	  (split-window-below)
 	(delete-window win)))))
 
+(defun rlp-hacker-news ()
+  (interactive)
+  (request "https://hacker-news.firebaseio.com/v0/topstories.json"
+  :parser 'json-read
+  :success
+  (cl-function (lambda (&key data &allow-other-keys)
+                 (when data
+                   (with-current-buffer (get-buffer-create "*HN Stories*")
+					 (org-mode)
+                     (erase-buffer)
+					 (seq-do (lambda (item)
+							   (request (format "https://hacker-news.firebaseio.com/v0/item/%d.json" item)
+								 :parser 'json-read
+								 :success
+								 (cl-function (lambda (&key data &allow-other-keys)
+												(when data
+												  (if (assoc 'url data)
+													  (insert "[["
+															  (cdr (assoc 'url data))
+															  "]["
+															  (cdr (assoc 'title data)) "]]\n")))))))
+							   ;;(insert (number-to-string item)))
+							 (seq-take data 21))
+                     (pop-to-buffer (current-buffer))))))
+  :error
+  (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                 (message "HN lookup failed: %S" error-thrown)))
+  :complete (lambda (&rest _) (message "Got yer news fer ya"))))
+
 ;; not actually using org-roam
 ;; (setq org-roam-directory (file-truename "~/Dropbox/Documents/notes"))
 ;; (org-roam-db-autosync-mode)
@@ -314,7 +344,7 @@ Version 2017-11-01"
    '(ccls lsp-actionscript lsp-ada lsp-angular lsp-ansible lsp-astro lsp-bash lsp-beancount lsp-clangd lsp-clojure lsp-cmake lsp-crystal lsp-csharp lsp-css lsp-d lsp-dart lsp-dhall lsp-docker lsp-dockerfile lsp-elm lsp-elixir lsp-emmet lsp-erlang lsp-eslint lsp-fortran lsp-fsharp lsp-gdscript lsp-go lsp-gleam lsp-graphql lsp-hack lsp-grammarly lsp-groovy lsp-haskell lsp-haxe lsp-idris lsp-java lsp-javascript lsp-json lsp-kotlin lsp-latex lsp-ltex lsp-lua lsp-markdown lsp-marksman lsp-mint lsp-nginx lsp-nim lsp-nix lsp-magik lsp-metals lsp-mssql lsp-ocaml lsp-openscad lsp-pascal lsp-perl lsp-perlnavigator lsp-pls lsp-php lsp-pwsh lsp-pyls lsp-pylsp lsp-pyright lsp-python-ms lsp-purescript lsp-r lsp-racket lsp-remark lsp-rf lsp-rust lsp-solargraph lsp-sorbet lsp-sourcekit lsp-sonarlint lsp-tailwindcss lsp-tex lsp-terraform lsp-toml lsp-ttcn3 lsp-typeprof lsp-v lsp-vala lsp-verilog lsp-volar lsp-vhdl lsp-vimscript lsp-xml lsp-yaml lsp-ruby-syntax-tree lsp-sqls lsp-svelte lsp-steep lsp-zig))
  '(lsp-disabled-clients '(vetur))
  '(package-selected-packages
-   '(ya-snippet lua-mode go-snippets yasnippet org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
+   '(request ya-snippet lua-mode go-snippets yasnippet org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
  '(rustic-analyzer-command '("/home/rob/.cargo/bin/rust-analyzer"))
  '(typescript-auto-indent-flag nil)
  '(typescript-indent-level 2)
