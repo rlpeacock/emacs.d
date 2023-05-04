@@ -6,8 +6,8 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
-(package-refresh-contents)
 (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
   (package-install 'use-package))
 
 ;; use-package should always install a package if it's not already installed
@@ -119,18 +119,60 @@
 (setq gc-cons-threshold 100000000)
 ;; LSP reads very large objects
 (setq read-process-output-max (* 1024 1024))
-
+;; format go code on save
 (add-hook 'before-save-hook 'gofmt-before-save)
 
-;; save modified buffers on focus out
-;; this seems to bypass before-save-hook so need to manually trigger go formatter
-(defun rlp-save-all ()
-  (interactive)
-  (when (eq major-mode 'go-mode)
-	(gofmt))
-  (message "saving everything!")
-  (save-some-buffers t))
-(add-hook 'focus-out-hook 'rlp-save-all)
+;; erc mode hook
+(add-hook 'erc-mode-hook
+          '(lambda ()
+			 ;; don't remember why I did this
+             (define-key erc-mode-map (kbd "s-<return>") 'erc-send-current-line)
+			 ;; erc stomps on mode-line-buffer-identification customization.
+			 ;; Override it's mode-line setup to use my custom settings.
+			 ;; This is copied right out of erc source with stomping bits removed.
+			 (defun erc-update-mode-line-buffer (buffer)
+			   "Update the mode line in a single ERC buffer BUFFER."
+			   (with-current-buffer buffer
+				 (let ((spec (format-spec-make
+							  ?a (erc-format-away-status)
+							  ?l (erc-format-lag-time)
+							  ?m (erc-format-channel-modes)
+							  ?n (or (erc-current-nick) "")
+							  ?N (erc-format-network)
+							  ?o (erc-controls-strip erc-channel-topic)
+							  ?p (erc-port-to-string erc-session-port)
+							  ?s (erc-format-target-and/or-server)
+							  ?S (erc-format-target-and/or-network)
+							  ?t (erc-format-target)))
+					   (process-status (cond ((and (erc-server-process-alive)
+												   (not erc-server-connected))
+											  ":connecting")
+											 ((erc-server-process-alive)
+											  "")
+											 (t
+											  ": CLOSED")))
+					   (face (cond ((eq erc-header-line-face-method nil)
+									nil)
+								   ((functionp erc-header-line-face-method)
+									(funcall erc-header-line-face-method))
+								   (t
+									'erc-header-line))))
+				   (setq mode-line-process (list process-status))
+				   (when (boundp 'header-line-format)
+					 (let ((header (if erc-header-line-format
+									   (format-spec erc-header-line-format spec)
+									 nil)))
+					   (cond (erc-header-line-uses-tabbar-p
+							  (set (make-local-variable 'tabbar--local-hlf)
+								   header-line-format)
+							  (kill-local-variable 'header-line-format))
+							 ((null header)
+							  (setq header-line-format nil))
+							 (t (setq header-line-format
+									  (if face
+										  (erc-propertize header 'face face)
+										header)))))))))))
+
 ;; ===========================================================================
 ;; cosmetics
 ;; ===========================================================================
@@ -155,6 +197,15 @@
 ;; functions
 ;; ===========================================================================
 
+(defun rlp-save-all ()
+  "Save modified buffers, but force gofmt for go mode because save-some-buffers doesn't trip before-save-hook"
+  (interactive)
+  (when (eq major-mode 'go-mode)
+	(gofmt))
+  (save-some-buffers t))
+
+;; Trigger save-all on focus out
+(add-hook 'focus-out-hook 'rlp-save-all)
 
 (defun xah-select-line ()
   "Select current line. If region is active, extend selection downward by line.
@@ -178,7 +229,7 @@ Version 2017-11-01"
 (add-hook 'ibuffer-mode-hook 'rlp-ibuffer-hook)
 
 (defun rlp-clickity-click ()
-  "Rigth click on right side or bottom of window will open a new window. Otherwise close window"
+  "Right click on right side or bottom of window will open a new window. Otherwise close window"
   (interactive)
   (let* ((pos (mouse-position))
 	 (frame (car pos))
@@ -199,6 +250,17 @@ Version 2017-11-01"
       (if (and (< px close-boundary) (> py close-boundary))
 	  (split-window-below)
 	(delete-window win)))))
+
+(defun rlp-ibuffer-switch ()
+  "Switch window with mouse pointer to ibuffer"
+  (interactive)
+  (let* ((pos (mouse-position))
+	 (frame (car pos))
+	 (fx (cadr pos))
+	 (fy (cddr pos))
+	 (win (window-at fx fy)))
+    (select-window win)
+	(ibuffer)))
 
 (defun rlp-hacker-news ()
   (interactive)
@@ -222,7 +284,7 @@ Version 2017-11-01"
 															  "]["
 															  (cdr (assoc 'title data)) "]]\n")))))))
 							   ;;(insert (number-to-string item)))
-							 (seq-take data 21))
+							 (seq-take data 51))
                      (pop-to-buffer (current-buffer))))))
   :error
   (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -315,10 +377,7 @@ Version 2017-11-01"
 (global-set-key (kbd "C-; n b") 'org-roam-buffer-toggle)
 (global-set-key (kbd "C-; n d") 'org-roam-display-dedicated)
 
-;; erc
-(add-hook 'erc-mode-hook
-          '(lambda ()
-             (define-key erc-mode-map (kbd "s-<return>") 'erc-send-current-line)))
+
 
 
 ;; mouse bindings - work in progress
@@ -327,7 +386,7 @@ Version 2017-11-01"
 (global-set-key [mouse-3] 'rlp-clickity-click)
 ;(global-set-key [mouse-3] 'mouse-delete-window)
 ;; clicking on filename in the modeline will bring up ibuffer
-(define-key mode-line-buffer-identification-keymap [mode-line mouse-1] 'ibuffer)
+(define-key mode-line-buffer-identification-keymap [mode-line mouse-1] 'rlp-ibuffer-switch)
 
 ;; ===========================================================================
 ;; customize
