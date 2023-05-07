@@ -173,6 +173,10 @@
 										  (erc-propertize header 'face face)
 										header)))))))))))
 
+;; This causes dired to open files in the same window rather than throwing
+;; it into another window
+(define-key dired-mode-map [mouse-2] 'dired-mouse-find-file)
+
 ;; ===========================================================================
 ;; cosmetics
 ;; ===========================================================================
