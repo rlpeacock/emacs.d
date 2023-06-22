@@ -13,7 +13,9 @@
 ;; use-package should always install a package if it's not already installed
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
-
+;; workaround for bug in treemacs that barfs because it doesn't know what svg is
+;; see: https://github.com/emacs-lsp/lsp-mode/issues/4054
+(add-to-list 'image-types 'svg)
 ;; add and configure packages
 (use-package ag)
 (use-package company)
@@ -53,12 +55,17 @@
 (use-package minions)
 (use-package multiple-cursors)
 (use-package org-roam)
-;(use-package org-tempo)
+;;(use-package org-tempo)
+(use-package project-treemacs)
 (use-package projectile)
 (use-package projectile-speedbar)
 (use-package request)
 (use-package rust-mode)
 (use-package rustic)
+(use-package lsp-treemacs
+  :config
+  ;; sync between lsp project and treemacs project
+  (lsp-treemacs-sync-mode 1))
 (use-package typescript-mode)
 (use-package use-package)
 (use-package vue-html-mode)
@@ -90,6 +97,7 @@
 (setq-default indent-tabs-mode 0)
 (setq-default tab-width 4)
 (setq-default display-line-numbers t)
+(electric-pair-mode t)
 (ido-mode)
 (minions-mode)
 (xterm-mouse-mode)
@@ -266,6 +274,7 @@ Version 2017-11-01"
     (select-window win)
 	(ibuffer)))
 
+
 (defun rlp-hacker-news ()
   (interactive)
   (request "https://hacker-news.firebaseio.com/v0/topstories.json"
@@ -294,6 +303,11 @@ Version 2017-11-01"
   (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                  (message "HN lookup failed: %S" error-thrown)))
   :complete (lambda (&rest _) (message "Got yer news fer ya"))))
+
+(defun rlp-mouse-expand ()
+  (interactive)
+  (mouse-set-point last-input-event)
+  (er/expand-region 1))
 
 ;; not actually using org-roam
 ;; (setq org-roam-directory (file-truename "~/Dropbox/Documents/notes"))
@@ -367,7 +381,7 @@ Version 2017-11-01"
 (global-set-key (kbd "s-d") 'mc/mark-next-like-this-word)
 (global-set-key (kbd "s-j") 'mc/mark-next-like-this) ;; what's this?
 
-;; expand-rgion
+;; expand-region
 (global-set-key (kbd "s-e") 'er/expand-region)
 
 ;; projectile
@@ -381,13 +395,10 @@ Version 2017-11-01"
 (global-set-key (kbd "C-; n b") 'org-roam-buffer-toggle)
 (global-set-key (kbd "C-; n d") 'org-roam-display-dedicated)
 
-
-
-
 ;; mouse bindings - work in progress
-(global-set-key [double-mouse-1] 'xah-select-line)
+(global-set-key [double-mouse-1] 'er/expand-region)
 ;;(global-set-key [mouse-2] 'split-window-below) ; doesn't work on mac
-(global-set-key [mouse-3] 'rlp-clickity-click)
+(global-set-key [mouse-3] 'rlp-mouse-expand)
 ;(global-set-key [mouse-3] 'mouse-delete-window)
 ;; clicking on filename in the modeline will bring up ibuffer
 (define-key mode-line-buffer-identification-keymap [mode-line mouse-1] 'rlp-ibuffer-switch)
@@ -407,7 +418,7 @@ Version 2017-11-01"
    '(ccls lsp-actionscript lsp-ada lsp-angular lsp-ansible lsp-astro lsp-bash lsp-beancount lsp-clangd lsp-clojure lsp-cmake lsp-crystal lsp-csharp lsp-css lsp-d lsp-dart lsp-dhall lsp-docker lsp-dockerfile lsp-elm lsp-elixir lsp-emmet lsp-erlang lsp-eslint lsp-fortran lsp-fsharp lsp-gdscript lsp-go lsp-gleam lsp-graphql lsp-hack lsp-grammarly lsp-groovy lsp-haskell lsp-haxe lsp-idris lsp-java lsp-javascript lsp-json lsp-kotlin lsp-latex lsp-ltex lsp-lua lsp-markdown lsp-marksman lsp-mint lsp-nginx lsp-nim lsp-nix lsp-magik lsp-metals lsp-mssql lsp-ocaml lsp-openscad lsp-pascal lsp-perl lsp-perlnavigator lsp-pls lsp-php lsp-pwsh lsp-pyls lsp-pylsp lsp-pyright lsp-python-ms lsp-purescript lsp-r lsp-racket lsp-remark lsp-rf lsp-rust lsp-solargraph lsp-sorbet lsp-sourcekit lsp-sonarlint lsp-tailwindcss lsp-tex lsp-terraform lsp-toml lsp-ttcn3 lsp-typeprof lsp-v lsp-vala lsp-verilog lsp-volar lsp-vhdl lsp-vimscript lsp-xml lsp-yaml lsp-ruby-syntax-tree lsp-sqls lsp-svelte lsp-steep lsp-zig))
  '(lsp-disabled-clients '(vetur))
  '(package-selected-packages
-   '(request ya-snippet lua-mode go-snippets yasnippet org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
+   '(lsp-treemacs lsp-treemaps project-treemaps project-treemacs request ya-snippet lua-mode go-snippets yasnippet org-tempo flycheck-golangci-lint flycheck-pycheckers flymake flymake-aspell flymake-css flymake-diagnostic-at-point flymake-eslint flymake-go-staticcheck go-dlv go-fill-struct flymake-go go-mode go-playground go-rename ag flycheck-rust rustic org-roam git-gutter-fringe multiple-cursors rust-mode typescript-mode flycheck-projectile go-projectile projectile projectile-speedbar company company-go flycheck use-package lsp-mode vue-html-mode vue-mode magit material-theme))
  '(rustic-analyzer-command '("/home/rob/.cargo/bin/rust-analyzer"))
  '(typescript-auto-indent-flag nil)
  '(typescript-indent-level 2)
